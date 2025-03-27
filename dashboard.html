@@ -32,7 +32,7 @@
             border: none;
             padding: 12px 25px;
             font-size: 18px;
-            color: black;
+            color: white;
             border-radius: 25px;
             cursor: pointer;
             transition: 0.3s;
@@ -47,12 +47,10 @@
         }
         .stop-btn {
             background: red;
-            color: white;
             display: none; /* Initially hidden */
         }
         .logout-btn {
             background: blue;
-            color: white;
             display: none; /* Initially hidden */
         }
         .webcam-box {
@@ -97,9 +95,9 @@
         let model, webcam, labelContainer, maxPredictions, isRunning = false;
 
         async function init() {
-            document.getElementById("start-btn").style.display = "none"; // Hide Start button while loading
-            document.getElementById("stop-btn").style.display = "none";
-            document.getElementById("logout-btn").style.display = "none";
+            document.getElementById("start-btn").style.display = "none"; // Hide Start button
+            document.getElementById("stop-btn").style.display = "none"; // Hide Stop button
+            document.getElementById("logout-btn").style.display = "none"; // Hide Logout button
 
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
@@ -144,8 +142,8 @@
             }
 
             if (showStopButton) {
-                document.getElementById("stop-btn").style.display = "block";
-                document.getElementById("logout-btn").style.display = "block"; 
+                document.getElementById("stop-btn").style.display = "block"; // Show Stop button
+                document.getElementById("logout-btn").style.display = "block"; // Show Logout button
             }
         }
 
@@ -157,7 +155,7 @@
         }
 
         function logout() {
-            window.location.href = "logout.html";
+            window.location.href = "logout.html"; // Redirects to logout page
         }
     </script>
 </body>
