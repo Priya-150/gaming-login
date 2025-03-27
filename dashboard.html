@@ -28,8 +28,7 @@
             color: #ff6f61;
             animation: fadeIn 2s ease-in-out;
         }
-        .start-btn {
-            background: linear-gradient(90deg, #ff9a8b, #ff6f61);
+        .btn {
             border: none;
             padding: 12px 25px;
             font-size: 18px;
@@ -37,10 +36,23 @@
             border-radius: 25px;
             cursor: pointer;
             transition: 0.3s;
+            margin-top: 10px;
+            display: none; /* Hidden initially */
+        }
+        .start-btn {
+            background: linear-gradient(90deg, #ff9a8b, #ff6f61);
             animation: bounce 1.5s infinite;
         }
         .start-btn:hover {
             background: linear-gradient(90deg, #ff6f61, #ff9a8b);
+        }
+        .stop-btn {
+            background: red;
+            color: white;
+        }
+        .logout-btn {
+            background: blue;
+            color: white;
         }
         .webcam-box {
             margin-top: 20px;
@@ -72,9 +84,11 @@
 <body>
     <div class="container">
         <h1>Dashboard - Teachable Machine Image Model</h1>
-        <button class="start-btn" onclick="init()">Start</button>
+        <button class="btn start-btn" onclick="init()">Start</button>
         <div id="webcam-container" class="webcam-box"></div>
         <div id="label-container" class="label-box"></div>
+        <button id="stop-btn" class="btn stop-btn" onclick="stopProcess()">Stop Process</button>
+        <button id="logout-btn" class="btn logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <script>
@@ -82,6 +96,7 @@
         let model, webcam, labelContainer, maxPredictions;
 
         async function init() {
+            document.querySelector(".start-btn").style.display = "none"; // Hide Start button
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
             model = await tmImage.load(modelURL, metadataURL);
@@ -108,10 +123,31 @@
 
         async function predict() {
             const prediction = await model.predict(webcam.canvas);
+            let showStopButton = false;
+            
             for (let i = 0; i < maxPredictions; i++) {
-                const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                const probability = prediction[i].probability.toFixed(2);
+                const classPrediction = `${prediction[i].className}: ${probability}`;
                 labelContainer.childNodes[i].innerHTML = classPrediction;
+
+                if (probability > 0.90) {
+                    showStopButton = true;
+                }
             }
+
+            if (showStopButton) {
+                document.getElementById("stop-btn").style.display = "block";
+                document.getElementById("logout-btn").style.display = "block"; // Show Logout button too
+            }
+        }
+
+        function stopProcess() {
+            webcam.stop();
+            document.getElementById("webcam-container").innerHTML = "<h2>Process Stopped</h2>";
+        }
+
+        function logout() {
+            window.location.href = "logout.html"; // Redirect to logout page
         }
     </script>
 </body>
