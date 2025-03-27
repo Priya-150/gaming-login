@@ -37,7 +37,6 @@
             cursor: pointer;
             transition: 0.3s;
             margin-top: 10px;
-            display: none; /* Hidden initially */
         }
         .start-btn {
             background: linear-gradient(90deg, #ff9a8b, #ff6f61);
@@ -49,10 +48,12 @@
         .stop-btn {
             background: red;
             color: white;
+            display: none; /* Initially hidden */
         }
         .logout-btn {
             background: blue;
             color: white;
+            display: none; /* Initially hidden */
         }
         .webcam-box {
             margin-top: 20px;
@@ -84,19 +85,22 @@
 <body>
     <div class="container">
         <h1>Dashboard - Teachable Machine Image Model</h1>
-        <button class="btn start-btn" onclick="init()">Start</button>
-        <div id="webcam-container" class="webcam-box"></div>
-        <div id="label-container" class="label-box"></div>
+        <button id="start-btn" class="btn start-btn" onclick="init()">Start</button>
         <button id="stop-btn" class="btn stop-btn" onclick="stopProcess()">Stop Process</button>
         <button id="logout-btn" class="btn logout-btn" onclick="logout()">Logout</button>
+        <div id="webcam-container" class="webcam-box"></div>
+        <div id="label-container" class="label-box"></div>
     </div>
 
     <script>
         const URL = "https://teachablemachine.withgoogle.com/models/rAU-fRb1w/";
-        let model, webcam, labelContainer, maxPredictions;
+        let model, webcam, labelContainer, maxPredictions, isRunning = false;
 
         async function init() {
-            document.querySelector(".start-btn").style.display = "none"; // Hide Start button
+            document.getElementById("start-btn").style.display = "none"; // Hide Start button while loading
+            document.getElementById("stop-btn").style.display = "none";
+            document.getElementById("logout-btn").style.display = "none";
+
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
             model = await tmImage.load(modelURL, metadataURL);
@@ -107,15 +111,19 @@
             await webcam.setup();
             await webcam.play();
             window.requestAnimationFrame(loop);
+            isRunning = true;
 
+            document.getElementById("webcam-container").innerHTML = "";
             document.getElementById("webcam-container").appendChild(webcam.canvas);
             labelContainer = document.getElementById("label-container");
+            labelContainer.innerHTML = "";
             for (let i = 0; i < maxPredictions; i++) {
                 labelContainer.appendChild(document.createElement("div"));
             }
         }
 
         async function loop() {
+            if (!isRunning) return;
             webcam.update();
             await predict();
             window.requestAnimationFrame(loop);
@@ -137,17 +145,19 @@
 
             if (showStopButton) {
                 document.getElementById("stop-btn").style.display = "block";
-                document.getElementById("logout-btn").style.display = "block"; // Show Logout button too
+                document.getElementById("logout-btn").style.display = "block"; 
             }
         }
 
         function stopProcess() {
+            isRunning = false;
             webcam.stop();
             document.getElementById("webcam-container").innerHTML = "<h2>Process Stopped</h2>";
+            document.getElementById("start-btn").style.display = "block"; // Show Start button again
         }
 
         function logout() {
-            window.location.href = "logout.html"; // Redirect to logout page
+            window.location.href = "logout.html";
         }
     </script>
 </body>
